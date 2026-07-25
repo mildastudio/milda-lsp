@@ -12,7 +12,10 @@ import { defineConfig } from 'tsup'
 // native `require` for Node built-ins. The result is a single self-contained CommonJS
 // file an editor can launch with `node dist/index.cjs`.
 export default defineConfig({
-  entry: ['src/index.ts'],
+  // `index` = the self-contained server binary; `highlight` = the side-effect-free
+  // token classifier, exposed as @mildastudio/milda-lsp/highlight for reuse (e.g. the
+  // docs site colours .milda snippets with the very same classifier).
+  entry: { index: 'src/index.ts', highlight: 'src/semantic-tokens.ts' },
   format: ['cjs'],
   target: 'node20',
   clean: true,

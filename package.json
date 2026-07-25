@@ -14,6 +14,9 @@
   "exports": {
     ".": {
       "default": "./dist/index.cjs"
+    },
+    "./highlight": {
+      "default": "./dist/highlight.cjs"
     }
   },
   "files": [

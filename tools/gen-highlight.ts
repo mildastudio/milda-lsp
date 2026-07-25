@@ -3,12 +3,16 @@
 //      the contract the Kotlin lexer must match.
 //   2. MildaVocab.kt — the shared keyword/type/color-fn sets, code-generated into the
 //      JetBrains plugin so the Kotlin lexer can't drift from ./src/vocab.ts.
+//   3. milda.tmLanguage.json — the VS Code / Open VSX TextMate grammar, built from the
+//      same vocab so its word lists can't drift either (skipped if the sibling
+//      milda-vscode package isn't checked out, e.g. in the standalone milda-lsp mirror).
 // Run: npm run gen:highlight -w @mildastudio/milda-lsp
 
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { computeSemanticTokens, decodeSemanticTokens } from '../src/semantic-tokens'
+import { buildTmLanguage } from '../src/tmgrammar'
 import { COLOR_FNS, KEYWORDS, TYPE_WORDS } from '../src/vocab'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -39,4 +43,15 @@ const ktDir = join(here, '..', '..', 'milda-jetbrains', 'src', 'main', 'kotlin',
 mkdirSync(ktDir, { recursive: true })
 writeFileSync(join(ktDir, 'MildaVocab.kt'), kotlin)
 
-console.log(`generated ${corpus.length} golden token file(s) + MildaVocab.kt`)
+// VS Code TextMate grammar — only when the sibling package is present.
+const vscodeSyntaxes = join(here, '..', '..', 'milda-vscode', 'syntaxes')
+let wroteGrammar = false
+if (existsSync(join(vscodeSyntaxes, '..'))) {
+  mkdirSync(vscodeSyntaxes, { recursive: true })
+  writeFileSync(join(vscodeSyntaxes, 'milda.tmLanguage.json'), `${JSON.stringify(buildTmLanguage(), null, 2)}\n`)
+  wroteGrammar = true
+}
+
+console.log(
+  `generated ${corpus.length} golden token file(s) + MildaVocab.kt${wroteGrammar ? ' + milda.tmLanguage.json' : ''}`,
+)
