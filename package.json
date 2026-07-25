@@ -1,0 +1,39 @@
+{
+  "name": "@mildastudio/milda-lsp",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Language Server (LSP) for the Milda design-system DSL — diagnostics, completion, hover, go-to-definition, outline, folding and semantic highlighting for any LSP-capable editor.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mildastudio/milda-lsp.git"
+  },
+  "bin": {
+    "milda-lsp": "./dist/index.cjs"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "gen:highlight": "tsx tools/gen-highlight.ts"
+  },
+  "dependencies": {
+    "@mildastudio/milda": "^0.1.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsup": "^8.5.1",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}

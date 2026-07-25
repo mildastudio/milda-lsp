@@ -1,0 +1,27 @@
+name: Publish
+
+# Publishes @mildastudio/milda-lsp to npm via TRUSTED PUBLISHING (OIDC) - no token.
+# One-time setup on npmjs.com: the package must exist (do the first publish manually),
+# then add this repo + workflow (release.yml) as a Trusted Publisher. Publish AFTER
+# @mildastudio/milda (this depends on it). Trigger by publishing a GitHub Release.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # OIDC trusted publishing + provenance
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
+      - run: npm install
+      - run: npm run build
+      - run: npm publish --provenance --access public
