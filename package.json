@@ -23,10 +23,11 @@
     "dev": "tsx src/index.ts",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "gen:highlight": "tsx tools/gen-highlight.ts"
   },
   "dependencies": {
-    "@mildastudio/milda": "^0.1.0",
+    "@mildastudio/milda": "^0.1.1",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
@@ -34,6 +35,7 @@
     "@types/node": "^20",
     "tsup": "^8.5.1",
     "tsx": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
