@@ -20,6 +20,18 @@ export {
   withUri,
 } from './required-parts'
 export { computeSignatureHelp } from './signature-help'
+// The one-shot check (`milda-check`) and the fence reader prose about the language is held to.
+export {
+  checkMildaFiles,
+  checkMildaFragment,
+  formatFinding,
+  FRAGMENT_WRAPS,
+  mildaFences,
+  type CheckFinding,
+  type CheckInput,
+  type FragmentWrap,
+  type MildaFence,
+} from './check'
 export {
   computeSemanticTokens,
   decodeSemanticTokens,

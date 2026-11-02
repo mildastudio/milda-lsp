@@ -48,6 +48,7 @@ import {
   SLOT_ARITIES,
   SLOT_MODIFIERS,
   SLOT_ROLES,
+  STATE_NAMES,
   TOKEN_TYPE_NAMES,
   TOKEN_TYPES_BY_NAME,
   TOKEN_VALUE_KINDS,
@@ -402,23 +403,14 @@ function suggest(
     // ── part { what it IS · how it is painted } ────────────────────────────────
     case 'part': {
       if (fresh) return [...keywords(PART_KEYWORDS), ...facetItems()]
-      if (prev === 'state') {
-        return preludeV0.states.map((s) =>
-          item(s.name, CompletionItemKind.EnumMember, `from ${s.from}`),
-        )
-      }
+      // A UI state: `state ▐`, `bind state ▐`, `when state ▐`, and `ancestor <part> ▐`.
+      if (prev === 'state' || statement[statement.length - 2] === 'ancestor') return stateItems()
       if (prev === 'slot') return [...keywords(SLOT_ARITIES), ...keywords(SLOT_MODIFIERS)]
       if (SLOT_ARITIES.includes(prev)) return keywords(SLOT_MODIFIERS)
       if (prev === 'of') return keywords(CONTENT_SPECS)
       if (prev === 'role') return keywords(SLOT_ROLES)
       if (prev === 'sample') return keywords(['example'])
       if (statement[0] === 'action' && statement.length === 2) return keywords(DEMO_ACTION_OPS)
-      // `bind state ▐` names a UI state, same vocabulary as a `state` block.
-      if (statement[0] === 'bind' && prev === 'state') {
-        return preludeV0.states.map((s) =>
-          item(s.name, CompletionItemKind.EnumMember, `from ${s.from}`),
-        )
-      }
       if (statement[0] === 'emits' || statement[0] === 'motion') return []
       const values = PART_STATEMENT_VALUES[prev]
       if (values) return words(values, CompletionItemKind.EnumMember, prev)
@@ -592,6 +584,15 @@ function suggest(
 }
 
 // ─── vocabulary helpers ───────────────────────────────────────────────────────
+
+/** Every UI state the reader accepts. The words are the vocabulary's `STATE_NAMES`; the prelude's
+ *  taxonomy is total over them, so it supplies each one's source as the detail. */
+function stateItems(): CompletionItem[] {
+  const from = new Map(preludeV0.states.map((s) => [s.name as string, s.from]))
+  return STATE_NAMES.map((name) =>
+    item(name, CompletionItemKind.EnumMember, `from ${from.get(name)}`),
+  )
+}
 
 /** Inside an asset or config/behaviour block: the keys it accepts, then nothing. A `node`-valued
  *  field takes a part PATH, which is the one place a block body offers document names. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { NODE_KINDS, PART_KEYWORDS } from '@mildastudio/milda'
+import { NODE_KINDS, PART_KEYWORDS, STATE_NAMES } from '@mildastudio/milda'
 import { computeCompletions } from './completion'
 
 // ─── Completion for the v0.3 surface (proposal 0041) ──────────────────────────
@@ -48,6 +48,14 @@ describe('a part statement', () => {
   it('offers the two bindings after `bind`, then the UI states', () => {
     expect(labels(PART('bind ▐'))).toEqual(['value', 'state'])
     expect(labels(PART('bind state ▐'))).toContain('disabled')
+  })
+
+  // The reader warns on any other word, so every position that names a state offers all of them -
+  // `focus-visible` and the calendar states included, which the prelude's old list left out.
+  it('offers every UI state the reader accepts, wherever a state is named', () => {
+    for (const at of ['state ▐', 'bind state ▐', 'when state ▐', 'when ancestor root ▐']) {
+      expect(labels(PART(at)), at).toEqual([...STATE_NAMES])
+    }
   })
 
   it('offers the behaviour kinds after `behavior`, then that behaviour’s own fields', () => {

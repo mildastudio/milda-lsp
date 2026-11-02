@@ -15,9 +15,11 @@ export default defineConfig({
   // `index` = the self-contained server binary; `highlight` = the side-effect-free
   // token classifier, exposed as @mildastudio/milda-lsp/highlight for reuse (e.g. the
   // docs site colours .milda snippets with the very same classifier); `language` = every
-  // feature the server answers, as plain functions, for an editor running in a web page.
+  // feature the server answers, as plain functions, for an editor running in a web page;
+  // `check` = the same diagnostics as a one-shot command (`milda-check`) for CI and agents.
   entry: {
     index: 'src/index.ts',
+    check: 'src/check-cli.ts',
     highlight: 'src/semantic-tokens.ts',
     language: 'src/language.ts',
   },
