@@ -11,6 +11,7 @@
 // parser would reject. Names declared in the document (tokens, types, context groups)
 // come from the span table.
 
+import { requiredPartCompletions } from './required-parts'
 import {
   ASSET_BASE_KEYS,
   ASSET_FIELD_KEYS,
@@ -172,7 +173,8 @@ export const STATEMENT_SNIPPETS: Readonly<Record<string, string>> = {
   // A component's members.
   props: 'props {\n\t$0\n}',
   events: 'events {\n\t$0\n}',
-  part: 'part ${1:name} {\n\t$0\n}',
+  // The kind is part of the shape: a saved file states what every part IS (0055).
+  part: `part \${1:name}: \${2|${NODE_KINDS.join(',')}|} {\n\t$0\n}`,
   realize: 'realize ${1:target} {\n\t$0\n}',
   // A part's own blocks.
   layout: 'layout { stack ${1:row}; gap ${2:space.2} }',
@@ -215,6 +217,10 @@ export function computeCompletions(
   )
   const snippets = caps.snippets === true
   const items = suggest(ctx, spans, snippets, tokens)
+  // Inside a component, the parts its archetype requires and the file does not have yet come
+  // first: they are the lines the reader would otherwise add on the author's behalf (0055).
+  if (ctx.scope === 'component' && ctx.statement.length === 0)
+    items.unshift(...requiredPartCompletions(text, position, snippets))
   // At the head of a statement, a keyword that has a known SHAPE arrives as that shape. Applied
   // here, once, rather than at each of the twenty places a keyword list is built - and only
   // where the keyword really is a statement head, which is the only place a scaffold is right.
@@ -307,6 +313,7 @@ function suggest(
     // ── component { … } ────────────────────────────────────────────────────────
     case 'component': {
       if (fresh) return keywords(COMPONENT_KEYWORDS)
+      if (statement[0] === 'part') return partHeader(statement, prev)
       if (prev === 'archetype') {
         return preludeV0.archetypes.map((a) => item(a.name, CompletionItemKind.Class, a.contract))
       }
@@ -484,6 +491,7 @@ function suggest(
 
     // ── example "…" for Component { demo · part } ──────────────────────────────
     case 'example':
+      if (statement[0] === 'part') return partHeader(statement, prev)
       return fresh ? keywords(EXAMPLE_KEYWORDS) : []
 
     // ── docs { site · footer · page } ──────────────────────────────────────────
@@ -622,7 +630,12 @@ function facetItems(): CompletionItem[] {
   const covers = new Map<string, string>(preludeV0.facets.map((f) => [f.name as string, f.covers]))
   return FACET_NAMES.map((name) =>
     // Prelude facet names are the AST spelling (`textClamp`); the surface uses `text.clamp`.
-    item(name, CompletionItemKind.Field, covers.get(name) ?? covers.get(camel(name))),
+    // An edge form (`inset.inline-start`, `border.top`) says what its base facet says.
+    item(
+      name,
+      CompletionItemKind.Field,
+      covers.get(name) ?? covers.get(camel(name)) ?? covers.get(name.split('.')[0]!),
+    ),
   )
 }
 
@@ -823,6 +836,16 @@ function declaredType(statement: string[]): string | null {
  *  past its absence when it is not: an author mid-line has not written it yet. */
 function propType(statement: string[]): string {
   return (statement[1] === ':' ? statement[2] : statement[1]) ?? ''
+}
+
+// `part Button: container {` - what a part IS, said where it is named (0055 §3.2). After the
+// name come the kinds, carrying the colon that introduces them, exactly as a token's type does;
+// after the kind, only the brace. The name itself is the author's.
+function partHeader(statement: readonly string[], prev: string): CompletionItem[] {
+  const kinds = () => words(NODE_KINDS, CompletionItemKind.EnumMember, 'kind')
+  if (statement.length === 2) return withColon(kinds())
+  if (prev === ':' && statement.length === 3) return kinds()
+  return []
 }
 
 /** The same suggestions, each carrying the `:` that introduces a type - the one spelling of

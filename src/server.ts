@@ -14,6 +14,7 @@ import {
   StreamMessageWriter,
   TextDocuments,
   TextDocumentSyncKind,
+  CodeActionKind,
   type InitializeResult,
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
@@ -24,6 +25,7 @@ import { computeDocumentSymbols } from './symbols'
 import { computeFoldingRanges } from './folding'
 import { computeCompletions } from './completion'
 import { computeHover } from './hover'
+import { computeCodeActions, withUri } from './required-parts'
 import { computeDefinition } from './definition'
 import { computeSemanticTokens, SEMANTIC_TOKEN_TYPES } from './semantic-tokens'
 import { computeSignatureHelp } from './signature-help'
@@ -84,6 +86,7 @@ export function startServer(): void {
         // Re-triggered on the separators, so the hint follows the argument being typed.
         signatureHelpProvider: { triggerCharacters: ['(', ' '], retriggerCharacters: [' ', '/'] },
         hoverProvider: true,
+        codeActionProvider: { codeActionKinds: [CodeActionKind.QuickFix] },
         definitionProvider: true,
         semanticTokensProvider: {
           legend: { tokenTypes: [...SEMANTIC_TOKEN_TYPES], tokenModifiers: [] },
@@ -136,6 +139,14 @@ export function startServer(): void {
   connection.onHover((params) => {
     const doc = documents.get(params.textDocument.uri)
     return doc ? computeHover(doc.getText(), params.position) : null
+  })
+
+  connection.onCodeAction((params) => {
+    const doc = documents.get(params.textDocument.uri)
+    if (!doc) return []
+    return computeCodeActions(doc.getText(), params.range, params.context.diagnostics).map((a) =>
+      withUri(a, params.textDocument.uri),
+    )
   })
 
   connection.onDefinition((params) => {

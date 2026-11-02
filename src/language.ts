@@ -13,6 +13,12 @@ export { computeCompletions, STATEMENT_SNIPPETS, type CompletionCapabilities } f
 export { computeDiagnostics, DIAGNOSTIC_SOURCE } from './diagnostics'
 export { computeSemanticDiagnostics, SEMANTIC_SOURCE } from './semantic'
 export { computeHover } from './hover'
+export {
+  computeCodeActions,
+  PART_REQUIRED_CODE,
+  requiredPartCompletions,
+  withUri,
+} from './required-parts'
 export { computeSignatureHelp } from './signature-help'
 export {
   computeSemanticTokens,
@@ -22,14 +28,17 @@ export {
   type SemanticTokenType,
 } from './semantic-tokens'
 export {
+  CodeActionKind,
   CompletionItemKind,
   DiagnosticSeverity,
   InsertTextFormat,
   MarkupKind,
+  type CodeAction,
   type CompletionItem,
   type Diagnostic,
   type Hover,
   type MarkupContent,
   type Position,
   type SignatureHelp,
+  type TextEdit,
 } from 'vscode-languageserver-types'

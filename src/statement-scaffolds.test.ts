@@ -1,4 +1,4 @@
-import { parseMildaDocument } from '@mildastudio/milda'
+import { NODE_KINDS, parseMildaDocument } from '@mildastudio/milda'
 import { describe, expect, it } from 'vitest'
 import { computeCompletions, STATEMENT_SNIPPETS } from './completion'
 
@@ -109,7 +109,10 @@ describe('a scaffold arrives only where the keyword is a statement head', () => 
   })
 
   it('scaffolds a part statement, and a part', () => {
-    expect(insertOf('component B {\n  ▐', 'part')).toBe('part ${1:name} {\n\t$0\n}')
+    // The kind is a choice at its own stop: a saved file states what every part IS (0055).
+    expect(insertOf('component B {\n  ▐', 'part')).toBe(
+      `part \${1:name}: \${2|${NODE_KINDS.join(',')}|} {\n\t$0\n}`,
+    )
     expect(insertOf('component B {\n  part root {\n    ▐', 'state')).toBe(
       'state ${1:hovered} {\n\t$0\n}',
     )
