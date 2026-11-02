@@ -1,4 +1,4 @@
-// ─── Milda LSP — diagnostics ──────────────────────────────────────────────────
+// ─── Milda LSP - diagnostics ──────────────────────────────────────────────────
 // The pure, transport-free core of the language server: source text → LSP
 // diagnostics. It reuses @mildastudio/milda's error-recovering parser, so this
 // stays a thin mapping layer rather than a second implementation of the grammar.
@@ -6,18 +6,18 @@
 // Two shape mismatches are bridged here:
 //   • The parser reports 1-based line/col; LSP wants 0-based line/character.
 //   • The parser anchors an issue at a single POINT (a token's start). LSP wants a
-//     RANGE, so we widen the anchor to the extent of the token underneath it — the
-//     whole word/path/number, or a string literal up to its closing quote — falling
+//     RANGE, so we widen the anchor to the extent of the token underneath it - the
+//     whole word/path/number, or a string literal up to its closing quote - falling
 //     back to a single column when the anchor sits on punctuation or past EOL.
 //
 // Extending the parser's AST to carry real spans is a later slice (M2); until then
 // this text-based widening gives squiggles that cover the offending token, which is
 // all the point diagnostics allow. Semantic validation (engine/validate) is also
-// M2 — its issues are position-free today, so surfacing them here would pile every
+// M2 - its issues are position-free today, so surfacing them here would pile every
 // one on line 1.
 
 import { parseMildaDocument, type ParseIssue, type ParseOptions } from '@mildastudio/milda'
-import { type Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver'
+import { type Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver-types'
 
 /** Tag shown next to every diagnostic so users can tell it came from this server. */
 export const DIAGNOSTIC_SOURCE = 'milda'
@@ -30,19 +30,25 @@ const WORD_CHAR = /[A-Za-z0-9_./%-]/
 export function computeDiagnostics(text: string, opts: ParseOptions = {}): Diagnostic[] {
   const { issues } = parseMildaDocument(text, opts)
   const lines = text.split('\n')
-  return issues.filter((issue) => !SUPPRESSED_CODES.has(issue.code)).map((issue) => toDiagnostic(issue, lines))
+  return issues
+    .filter((issue) => !SUPPRESSED_CODES.has(issue.code))
+    .map((issue) => toDiagnostic(issue, lines))
 }
 
 // Internal lowering notes that are ubiquitous and never actionable now that values are
-// first-class — dropped from the editor entirely (the parser still records them for
+// first-class - dropped from the editor entirely (the parser still records them for
 // programmatic consumers):
-//   inline-literal — every inline value literal in an alias slot is hoisted to a token.
-//   ref-sugar      — every unconditional ref lowers to a default-only alias.
+//   inline-literal - every inline value literal in an alias slot is hoisted to a token.
+//   ref-sugar      - every unconditional ref lowers to a default-only alias.
 const SUPPRESSED_CODES = new Set(['inline-literal', 'ref-sugar'])
 
 // A benign informational note, kept but softened to a Hint (subtle, not a warning
-// squiggle): `axis-fixed` — a bare `fixed` axis with no dimension is treated as `fit`.
-const HINT_CODES = new Set(['axis-fixed'])
+// squiggle):
+//   axis-fixed - a bare `fixed` axis with no dimension is treated as `fit`.
+//   web-unit   - `rem` read as a text-scaled length (0038). Importers legitimately
+//                carry it, so this must not squiggle; it only points at the canonical
+//                spelling.
+const HINT_CODES = new Set(['axis-fixed', 'web-unit'])
 
 function severityOf(issue: ParseIssue): DiagnosticSeverity {
   if (issue.severity === 'error') return DiagnosticSeverity.Error

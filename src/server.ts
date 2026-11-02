@@ -1,4 +1,4 @@
-// ─── Milda LSP — server wiring ────────────────────────────────────────────────
+// ─── Milda LSP - server wiring ────────────────────────────────────────────────
 // Binds the pure feature cores (./diagnostics, ./semantic, ./symbols, ./folding) to
 // an LSP transport over stdio. Editors (JetBrains via LspServerSupportProvider,
 // VS Code, Neovim, Zed) spawn this process and speak LSP to it; all Milda-specific
@@ -26,6 +26,34 @@ import { computeCompletions } from './completion'
 import { computeHover } from './hover'
 import { computeDefinition } from './definition'
 import { computeSemanticTokens, SEMANTIC_TOKEN_TYPES } from './semantic-tokens'
+import { computeSignatureHelp } from './signature-help'
+
+// Where the completion list should open by itself.
+//
+// The punctuation is the obvious half: each of these ends one decision and begins the next -
+// `:` (now the type), `=` (now the value), `(` (now the channels), `.` (a token path), a space
+// (the next word of a statement).
+//
+// The letters are the surprising half, and they are here for a concrete reason: JetBrains' LSP
+// client opens the completion popup ONLY for a character the server declared as a trigger
+// (`LspAutoPopupTypedHandler` checks the typed char against `completionProvider.triggerCharacters`
+// and does nothing otherwise). Without them, typing `a` inside `component { … }` asked the server
+// nothing, and the author had to know to press the completion shortcut to discover `archetype`,
+// `props`, `part` - a surface nobody can discover is a surface nobody uses. Editors that already
+// open on identifier characters (VS Code) are unaffected: they were asking us anyway.
+const LETTERS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))
+const COMPLETION_TRIGGERS: string[] = [
+  '.',
+  ' ',
+  ':',
+  '=',
+  '(',
+  '-',
+  '/',
+  '$',
+  ...LETTERS,
+  ...LETTERS.map((c) => c.toUpperCase()),
+]
 
 export function startServer(): void {
   // Wire stdio explicitly so the binary works over stdin/stdout without the caller
@@ -38,13 +66,23 @@ export function startServer(): void {
   )
   const documents = new TextDocuments(TextDocument)
 
-  connection.onInitialize(
-    (): InitializeResult => ({
+  // What the CLIENT can do, read once at initialize. Only snippets change what we send: a
+  // suggestion with tab stops is worse than useless in a client that would paste `${1:name}`
+  // as text, so the shape of the answer depends on this.
+  let clientSnippets = false
+
+  connection.onInitialize((params): InitializeResult => {
+    clientSnippets =
+      params.capabilities.textDocument?.completion?.completionItem?.snippetSupport === true
+    return {
       capabilities: {
         textDocumentSync: TextDocumentSyncKind.Incremental,
         documentSymbolProvider: true,
         foldingRangeProvider: true,
-        completionProvider: { triggerCharacters: ['.', ' '] },
+        completionProvider: { triggerCharacters: COMPLETION_TRIGGERS },
+        // While the cursor is inside a literal's parentheses, say what its channels are.
+        // Re-triggered on the separators, so the hint follows the argument being typed.
+        signatureHelpProvider: { triggerCharacters: ['(', ' '], retriggerCharacters: [' ', '/'] },
         hoverProvider: true,
         definitionProvider: true,
         semanticTokensProvider: {
@@ -53,8 +91,8 @@ export function startServer(): void {
         },
       },
       serverInfo: { name: 'milda-lsp', version: '0.1.0' },
-    }),
-  )
+    }
+  })
 
   const publish = (doc: TextDocument): void => {
     const text = doc.getText()
@@ -85,7 +123,14 @@ export function startServer(): void {
 
   connection.onCompletion((params) => {
     const doc = documents.get(params.textDocument.uri)
-    return doc ? computeCompletions(doc.getText(), params.position) : []
+    return doc
+      ? computeCompletions(doc.getText(), params.position, { snippets: clientSnippets })
+      : []
+  })
+
+  connection.onSignatureHelp((params) => {
+    const doc = documents.get(params.textDocument.uri)
+    return doc ? computeSignatureHelp(doc.getText(), params.position) : null
   })
 
   connection.onHover((params) => {

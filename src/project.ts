@@ -1,4 +1,4 @@
-// ─── Milda LSP — project (cross-file) context ─────────────────────────────────
+// ─── Milda LSP - project (cross-file) context ─────────────────────────────────
 // A Milda design system is authored as one directory of `.milda` files (foundations,
 // palettes, and component files that reference each other). Analyzing a single file
 // in isolation reports every cross-file reference as "missing", so the semantic pass
@@ -48,7 +48,7 @@ export function readSiblingMildaTexts(uri: string): string[] {
       cache.set(full, { mtimeMs, text })
       out.push(text)
     } catch {
-      // unreadable / deleted between readdir and read — skip it
+      // unreadable / deleted between readdir and read - skip it
     }
   }
   return out

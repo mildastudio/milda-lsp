@@ -1,4 +1,4 @@
-// ─── Milda LSP — semantic diagnostics ─────────────────────────────────────────
+// ─── Milda LSP - semantic diagnostics ─────────────────────────────────────────
 // The engine's `validate` pass catches meaning-level problems: unknown archetypes,
 // alias-by an undeclared context group, facet/layout references to missing tokens,
 // dangling param→prop bindings, unknown states.
@@ -18,12 +18,15 @@ import {
   type NodeSpan,
   type Project,
 } from '@mildastudio/milda'
-import { type Diagnostic, DiagnosticSeverity } from 'vscode-languageserver'
+import { type Diagnostic, DiagnosticSeverity } from 'vscode-languageserver-types'
 import { toLspRange } from './range'
 
 export const SEMANTIC_SOURCE = 'milda-semantic'
 
-export function computeSemanticDiagnostics(text: string, siblingTexts: string[] = []): Diagnostic[] {
+export function computeSemanticDiagnostics(
+  text: string,
+  siblingTexts: string[] = [],
+): Diagnostic[] {
   const current = parseMildaDocument(text)
   const merged = mergeDocuments([
     current.document,

@@ -1,10 +1,10 @@
-// ─── Milda LSP — folding ranges ───────────────────────────────────────────────
+// ─── Milda LSP - folding ranges ───────────────────────────────────────────────
 // Every multi-line declaration span (component, context-group, part, and any token
 // or type that wraps) becomes a foldable region. Derived from the same span table as
 // symbols, so folds line up exactly with the outline.
 
 import { parseMildaDocument } from '@mildastudio/milda'
-import { type FoldingRange } from 'vscode-languageserver'
+import { type FoldingRange } from 'vscode-languageserver-types'
 
 export function computeFoldingRanges(text: string): FoldingRange[] {
   const { spans } = parseMildaDocument(text)

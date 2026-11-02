@@ -7,9 +7,9 @@ context-group Size { S1 S2 S3 }
 component Button "Trigger an action" {
   archetype Button
   props {
-    size    Size    = S2
-    loading boolean = false
-    label   string
+    size    : Size    = S2
+    loading : boolean = false
+    label   : string
   }
   events { click from A.invoke }
   part root {

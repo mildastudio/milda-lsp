@@ -1,11 +1,11 @@
-// ─── Milda LSP — shared analysis ──────────────────────────────────────────────
+// ─── Milda LSP - shared analysis ──────────────────────────────────────────────
 // Position-oriented helpers shared by completion, hover, and definition. Everything
 // here works off the M2 span table plus the current line text; there is no second
 // parse of the grammar. References resolve to declarations by (kind, name) so we
 // never re-derive the parser's ids and risk drift.
 
 import { parseMildaDocument, type DesignSystemDocument, type NodeSpan } from '@mildastudio/milda'
-import { type Position, type Range } from 'vscode-languageserver'
+import { type Position, type Range } from 'vscode-languageserver-types'
 import { toLspRange } from './range'
 
 export interface Parsed {
@@ -37,13 +37,17 @@ export function wordAt(text: string, position: Position): WordAt | null {
   if (s === e) return null
   return {
     text: line.slice(s, e),
-    range: { start: { line: position.line, character: s }, end: { line: position.line, character: e } },
+    range: {
+      start: { line: position.line, character: s },
+      end: { line: position.line, character: e },
+    },
   }
 }
 
 function contains(range: Range, p: Position): boolean {
   const afterStart =
-    p.line > range.start.line || (p.line === range.start.line && p.character >= range.start.character)
+    p.line > range.start.line ||
+    (p.line === range.start.line && p.character >= range.start.character)
   const beforeEnd =
     p.line < range.end.line || (p.line === range.end.line && p.character <= range.end.character)
   return afterStart && beforeEnd

@@ -1,8 +1,8 @@
-// ─── Milda LSP — position conversion ──────────────────────────────────────────
+// ─── Milda LSP - position conversion ──────────────────────────────────────────
 // Milda source positions (lexer, ParseIssue, NodeSpan) are 1-based in both line and
 // column; LSP is 0-based in both. This is the single place that bridge lives.
 
-import { type Range } from 'vscode-languageserver'
+import { type Range } from 'vscode-languageserver-types'
 import { type SourceRange } from '@mildastudio/milda'
 
 export function toLspRange(r: SourceRange): Range {

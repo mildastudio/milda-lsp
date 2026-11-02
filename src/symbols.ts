@@ -1,11 +1,11 @@
-// ─── Milda LSP — document symbols ─────────────────────────────────────────────
+// ─── Milda LSP - document symbols ─────────────────────────────────────────────
 // Turns the parser's span side-table (NodeSpan) into a hierarchical outline: the
 // component/token/context-group/type declarations at the top level, with parts,
 // props, events (and context members) nested underneath via `parentId`. Powers the
 // editor's Structure/Outline view and breadcrumbs.
 
 import { parseMildaDocument, type SpanKind } from '@mildastudio/milda'
-import { type DocumentSymbol, type Range, SymbolKind } from 'vscode-languageserver'
+import { type DocumentSymbol, type Range, SymbolKind } from 'vscode-languageserver-types'
 import { toLspRange } from './range'
 
 const KIND: Record<SpanKind, SymbolKind> = {
@@ -14,6 +14,8 @@ const KIND: Record<SpanKind, SymbolKind> = {
   contextGroup: SymbolKind.Enum,
   context: SymbolKind.EnumMember,
   sharedType: SymbolKind.Interface,
+  globalProp: SymbolKind.Property,
+  rule: SymbolKind.Event,
   part: SymbolKind.Field,
   prop: SymbolKind.Property,
   event: SymbolKind.Event,

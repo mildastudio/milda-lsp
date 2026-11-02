@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DiagnosticSeverity } from 'vscode-languageserver'
+import { DiagnosticSeverity } from 'vscode-languageserver-types'
 import { computeDiagnostics, DIAGNOSTIC_SOURCE } from './diagnostics'
 
 const errors = (text: string) =>
@@ -13,14 +13,14 @@ describe('computeDiagnostics', () => {
   })
 
   it('suppresses ubiquitous lowering notes (inline-literal, ref-sugar)', () => {
-    // An inline color literal in an alias slot is hoisted (inline-literal) — not shown.
-    expect(codes('foundations {\n  token c : color = alias by G { X -> hex(fff) }\n}')).not.toContain(
-      'inline-literal',
-    )
-    // An unconditional ref lowers to a default-only alias (ref-sugar) — not shown.
-    expect(codes('foundations {\n  token a : color = hex(fff)\n  token b : color = a\n}')).not.toContain(
-      'ref-sugar',
-    )
+    // An inline color literal in an alias slot is hoisted (inline-literal) - not shown.
+    expect(
+      codes('foundations {\n  token c : color = alias by G { X -> hex(fff) }\n}'),
+    ).not.toContain('inline-literal')
+    // An unconditional ref lowers to a default-only alias (ref-sugar) - not shown.
+    expect(
+      codes('foundations {\n  token a : color = hex(fff)\n  token b : color = a\n}'),
+    ).not.toContain('ref-sugar')
   })
 
   it('returns nothing for a comment-only document', () => {
@@ -44,7 +44,9 @@ describe('computeDiagnostics', () => {
   })
 
   it('surfaces a bare `fixed` axis as a Hint, not a Warning', () => {
-    const diags = computeDiagnostics('component T "t" {\n  part root { layout { size fixed fixed } }\n}')
+    const diags = computeDiagnostics(
+      'component T "t" {\n  part root { layout { size fixed fixed } }\n}',
+    )
     const af = diags.find((d) => d.code === 'axis-fixed')
     expect(af).toBeDefined()
     expect(af!.severity).toBe(DiagnosticSeverity.Hint)

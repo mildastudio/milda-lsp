@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CompletionItemKind, MarkupKind } from 'vscode-languageserver'
+import { CompletionItemKind, MarkupKind } from 'vscode-languageserver-types'
 import { computeCompletions } from './completion'
 import { computeHover } from './hover'
 import { computeDefinition } from './definition'
@@ -44,7 +44,9 @@ describe('computeCompletions', () => {
 
   it('suggests top-level keywords at the document root', () => {
     const items = computeCompletions(SRC, { line: 3, character: 0 })
-    expect(labels(items)).toEqual(expect.arrayContaining(['component', 'foundations', 'context-group']))
+    expect(labels(items)).toEqual(
+      expect.arrayContaining(['component', 'foundations', 'context-group']),
+    )
   })
 })
 

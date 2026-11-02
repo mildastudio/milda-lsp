@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver'
+import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver-types'
 import { computeDocumentSymbols } from './symbols'
 import { computeFoldingRanges } from './folding'
 import { computeSemanticDiagnostics, SEMANTIC_SOURCE } from './semantic'
@@ -20,8 +20,8 @@ const SRC = [
   'component Button "A button" {', // line 9
   '  archetype Nonexistent', // line 10
   '  props {', // line 11
-  '    size Size = S1', // line 12
-  '    loading boolean = false', // line 13
+  '    size : Size = S1', // line 12
+  '    loading : boolean = false', // line 13
   '  }', // line 14
   '  events { click }', // line 15
   '  part root {', // line 16

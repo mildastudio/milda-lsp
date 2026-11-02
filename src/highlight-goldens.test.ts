@@ -6,10 +6,12 @@ import { computeSemanticTokens, decodeSemanticTokens } from './semantic-tokens'
 
 // The committed golden token streams (highlight-corpus/*.tokens.json) are the contract
 // the Kotlin lexer is tested against. This test keeps them FRESH: if the TS classifier
-// changes, the goldens must be regenerated (`npm run gen:highlight`) or this fails —
+// changes, the goldens must be regenerated (`npm run gen:highlight`) or this fails -
 // which in turn signals the Kotlin lexer needs re-checking against the new goldens.
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'highlight-corpus')
-const files = readdirSync(corpusDir).filter((f) => f.endsWith('.milda')).sort()
+const files = readdirSync(corpusDir)
+  .filter((f) => f.endsWith('.milda'))
+  .sort()
 
 describe('highlight goldens are fresh (TS is the source of truth)', () => {
   it('has a corpus', () => {

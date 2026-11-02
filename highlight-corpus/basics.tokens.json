@@ -36,10 +36,22 @@
     "type": "keyword"
   },
   {
+    "line": 4,
+    "char": 14,
+    "length": 4,
+    "type": "class"
+  },
+  {
     "line": 6,
     "char": 0,
     "length": 9,
     "type": "keyword"
+  },
+  {
+    "line": 6,
+    "char": 10,
+    "length": 6,
+    "type": "class"
   },
   {
     "line": 6,
@@ -61,31 +73,55 @@
   },
   {
     "line": 9,
-    "char": 20,
+    "char": 12,
+    "length": 1,
+    "type": "operator"
+  },
+  {
+    "line": 9,
+    "char": 14,
+    "length": 4,
+    "type": "type"
+  },
+  {
+    "line": 9,
+    "char": 22,
     "length": 1,
     "type": "operator"
   },
   {
     "line": 10,
     "char": 12,
-    "length": 7,
-    "type": "type"
-  },
-  {
-    "line": 10,
-    "char": 20,
     "length": 1,
     "type": "operator"
   },
   {
     "line": 10,
+    "char": 14,
+    "length": 7,
+    "type": "type"
+  },
+  {
+    "line": 10,
     "char": 22,
+    "length": 1,
+    "type": "operator"
+  },
+  {
+    "line": 10,
+    "char": 24,
     "length": 5,
     "type": "keyword"
   },
   {
     "line": 11,
     "char": 12,
+    "length": 1,
+    "type": "operator"
+  },
+  {
+    "line": 11,
+    "char": 14,
     "length": 6,
     "type": "type"
   },
@@ -112,6 +148,12 @@
     "char": 2,
     "length": 4,
     "type": "keyword"
+  },
+  {
+    "line": 14,
+    "char": 7,
+    "length": 4,
+    "type": "class"
   },
   {
     "line": 15,

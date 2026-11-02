@@ -1,5 +1,9 @@
 foundations {
   token brand   : color   = hex(3b82f6)
+  token pure    : color   = hex(fff)
+  token loud    : color   = hex(ABCDEF)
+  token soft    : color   = oklch(62% 0.19 256deg / 50%)
+  token nudge   : spacing = scaled(1.25)
   token white   : color   = srgb(1 1 1)
   token glass   : color   = srgb(1 1 1 0.8)
   token vivid   : color   = oklch(0.62 0.19 256)
@@ -18,7 +22,7 @@ foundations {
 
 component Toggle "two-state" {
   archetype ToggleButton
-  props { on boolean = false }
+  props { on : boolean = false }
   part root {
     text.wrap wrap
     slant italic

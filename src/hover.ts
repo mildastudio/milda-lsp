@@ -1,10 +1,10 @@
-// ─── Milda LSP — hover ────────────────────────────────────────────────────────
+// ─── Milda LSP - hover ────────────────────────────────────────────────────────
 // Markdown docs for the identifier under the cursor. Resolution order: a declaration
 // in this document (either the cursor is on its name, or the word references it),
 // then the prelude vocabulary (archetype / facet / state).
 
 import { preludeV0, type DesignSystemDocument, type NodeSpan } from '@mildastudio/milda'
-import { type Hover, MarkupKind, type Position } from 'vscode-languageserver'
+import { type Hover, MarkupKind, type Position } from 'vscode-languageserver-types'
 import { parse, resolveDeclaration, spanAtName, wordAt } from './analysis'
 
 export function computeHover(text: string, position: Position): Hover | null {
@@ -17,8 +17,11 @@ export function computeHover(text: string, position: Position): Hover | null {
 
   const arch = preludeV0.archetypes.find((a) => a.name === w.text)
   if (arch) {
-    const composes = arch.composes.length ? arch.composes.join(', ') : '—'
-    return hover(`**archetype** \`${arch.name}\`\n\n${arch.contract}\n\ncomposes: ${composes}`, w.range)
+    const composes = arch.composes.length ? arch.composes.join(', ') : '-'
+    return hover(
+      `**archetype** \`${arch.name}\`\n\n${arch.contract}\n\ncomposes: ${composes}`,
+      w.range,
+    )
   }
   const facet = preludeV0.facets.find((f) => f.name === w.text)
   if (facet) return hover(`**facet** \`${facet.name}\`\n\n${facet.covers}`, w.range)
