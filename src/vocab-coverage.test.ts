@@ -21,7 +21,6 @@ const NAME_LIKE =
   'a plausible name for a part, prop, token or page, so colouring it as syntax misleads'
 const VALUE_WORD =
   'a value or option word inside a statement, coloured by position rather than as a keyword'
-const UNDECIDED = 'not yet decided: added to this list when the guard was introduced (2026-11-02)'
 
 const NOT_HIGHLIGHTED: Record<string, string> = {
   action: NAME_LIKE,
@@ -61,19 +60,13 @@ const NOT_HIGHLIGHTED: Record<string, string> = {
   static: VALUE_WORD,
   under: VALUE_WORD,
   url: VALUE_WORD,
-  ancestor: UNDECIDED,
-  and: UNDECIDED,
-  compute: UNDECIDED,
-  custom: UNDECIDED,
-  folder: UNDECIDED,
-  for: UNDECIDED,
-  glyph: UNDECIDED,
-  kind: UNDECIDED,
-  'labeled-by': UNDECIDED,
-  not: UNDECIDED,
-  only: UNDECIDED,
-  or: UNDECIDED,
-  origin: UNDECIDED,
+  custom: NAME_LIKE,
+  folder: NAME_LIKE,
+  for: NAME_LIKE,
+  glyph: NAME_LIKE,
+  kind: NAME_LIKE,
+  only: NAME_LIKE,
+  origin: NAME_LIKE,
 }
 
 describe('the highlight vocabulary and the parser', () => {
